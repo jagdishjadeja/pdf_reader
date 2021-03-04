@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pdf_reader/dialog/rename_file.dart';
+import 'package:pdf_reader/model/file_operations.dart';
 import 'package:pdf_reader/model/pdf_files.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pdf_reader/model/pdf_files_model.dart';
 import 'package:pdf_reader/service/shared_service.dart';
 import 'package:provider/provider.dart';
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+import 'package:flutter_share/flutter_share.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Future<List<PdfFiles>> _futureFiles;
+  // Future<List<PdfFiles>> _futureFiles;
 
   void showToast(String message) {
     var fToast = FToast();
@@ -35,42 +38,57 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<PdfFiles> fileOperations(int operation, PdfFiles file) async {
-    if (operation == 0) {
+  Future<PdfFiles> fileOperations(
+    FileOperations operation,
+    PdfFiles file,
+  ) async {
+    var pdfProvider = Provider.of<PdfFilesModel>(context, listen: true);
+
+    if (operation == FileOperations.Favourite) {
       // Custom Toast Position
-      file.isFavourite = !file.isFavourite;
 
       if (file.isFavourite) {
-        await SharedService.removeFromFavourite(file.filePath);
+        await SharedService.removeFromFavourite(file.file.path);
         showToast('Removed From Favourite');
       } else {
-        SharedService.addToFavourite(file.filePath);
+        await SharedService.addToFavourite(file.file.path);
         showToast('Added to favourite');
       }
+      file.isFavourite = !file.isFavourite;
       return file;
-    } else if (operation == 1) {
+    } else if (operation == FileOperations.Share) {
+      await FlutterShare.shareFile(
+        title: 'Example share',
+        text: 'Example share text',
+        filePath: file.file.path,
+      );
+
       return file;
-    } else if (operation == 2) {
+    } else if (operation == FileOperations.Rename) {
       var newFileName = await showDialog<String>(
         context: context,
         builder: (context) => RenameDialog(
           fileName: file.name,
         ),
       );
-      var newFilePath = file.filePath + '/' + newFileName + '.pdf';
-      file.name = newFileName;
-      file.file = await file.file.rename(newFilePath);
+      if (newFileName != null) {
+        var newFilePath = file.filePath + '/' + newFileName + '.pdf';
+        file.name = newFileName;
+        file.file = await file.file.rename(newFilePath);
+      }
+
       return file;
-    } else if (operation == 3) {
-      return file;
-    } else if (operation == 4) {
+    } else if (operation == FileOperations.Delete) {
+      var tempFile = file;
+      await tempFile.file.delete();
+      showToast('${file.name} file deleted');
       return file;
     } else {
       return file;
     }
   }
 
-  Widget getFavouriteInrow(isFavourite) {
+  Widget getFavouriteInrow(bool isFavourite) {
     if (isFavourite) {
       return Icon(
         Icons.star,
@@ -93,30 +111,117 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget _buildTrailing(PdfFiles file, int index) {
+    var pdfProvider = Provider.of<PdfFilesModel>(context, listen: true);
+
+    return PopupMenuButton(
+      onSelected: (FileOperations operation) async {
+        debugPrint('favourite - ${file.isFavourite}');
+        var tempFile = await fileOperations(operation, file);
+        if (operation == FileOperations.Favourite) {
+          pdfProvider.updateArray(index, tempFile.isFavourite);
+        } else if (operation == FileOperations.Share) {
+        } else if (operation == FileOperations.Rename) {
+        } else if (operation == FileOperations.Delete) {
+          pdfProvider.deleteFile(index);
+        }
+      },
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            child: Row(
+              children: [
+                getFavourite(file.isFavourite),
+                SizedBox(width: 10),
+                Text('Favourite'),
+              ],
+            ),
+            value: FileOperations.Favourite,
+          ),
+          PopupMenuItem(
+            child: Row(
+              children: [
+                Icon(Icons.share),
+                SizedBox(width: 10),
+                Text('Share'),
+              ],
+            ),
+            value: FileOperations.Share,
+          ),
+          PopupMenuItem(
+            child: Row(
+              children: [
+                Icon(Icons.edit),
+                SizedBox(width: 10),
+                Text('Rename'),
+              ],
+            ),
+            value: FileOperations.Rename,
+          ),
+          PopupMenuItem(
+            child: Row(
+              children: [
+                Icon(Icons.delete),
+                SizedBox(width: 10),
+                Text('Delete'),
+              ],
+            ),
+            value: FileOperations.Delete,
+          ),
+        ];
+      },
+    );
+  }
+
   Widget _showFiles(AsyncSnapshot<List<PdfFiles>> fileSnap) {
-    print(fileSnap.data);
     if (fileSnap.hasData) {
-      print('here ${fileSnap.data.length}');
-      var pdfProvider = Provider.of<PdfFilesModel>(context, listen: false);
+      debugPrint("${fileSnap.data[0].isFavourite}");
       return Consumer<PdfFilesModel>(
         builder: (context, pdffiles, child) {
+          // var pdfProvider = Provider.of<PdfFilesModel>(context, listen: true);
+          var files = pdffiles.allPdfFiles;
           return Container(
             child: ListView.builder(
+              itemCount: files.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  onTap: () async {
+                    PDFDocument doc =
+                        await PDFDocument.fromFile(files[index].file);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return PDFViewer(
+                            document: doc,
+                            zoomSteps: 1,
+                          );
+                        },
+                      ),
+                    );
+                  },
                   leading: Icon(Icons.picture_as_pdf),
-                  title: Text(pdfProvider.allPdfFiles[index].name),
-                  subtitle: Text(
-                      '${pdfProvider.allPdfFiles[index].lastModified} - ${pdfProvider.allPdfFiles[index].size}'),
-                  trailing: IconButton(
-                    icon: Icon(Icons.favorite),
-                    onPressed: () {
-                      setState(() {});
-                    },
+                  title: SizedBox(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 200,
+                          // color: Colors.red,
+                          child: Text(
+                            files[index].name,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        getFavouriteInrow(files[index].isFavourite)
+                      ],
+                    ),
                   ),
+                  subtitle: Text(
+                    '${files[index].lastModified} - ${files[index].size}',
+                  ),
+                  trailing: _buildTrailing(files[index], index),
                 );
               },
-              itemCount: pdfProvider.getPdfFiles().length,
             ),
           );
         },
@@ -135,18 +240,57 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _futureFiles = getFiles();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PdfFilesModel>(
-      builder: (context, model, widget) => FutureBuilder(
-        future: model.getPdfFilesProvider(),
-        builder: (BuildContext context, AsyncSnapshot<List<PdfFiles>> snap) {
-          return _showFiles(snap);
-        },
-      ),
+    // return Consumer<PdfFilesModel>(
+    //   builder: (context, model, widget) => FutureBuilder(
+    //     future: model.getPdfFilesProvider(),
+    //     builder: (BuildContext context, AsyncSnapshot<List<PdfFiles>> snap) {
+    //       debugPrint('Future builder called aa');
+    //       return _showFiles(snap);
+    //     },
+    //   ),
+    // );
+    var pdfProvider = Provider.of<PdfFilesModel>(
+      context,
+      listen: false,
+    );
+
+    return FutureBuilder(
+      future: pdfProvider.getPdfFilesProvider(),
+      builder: (context, AsyncSnapshot<List<PdfFiles>> asyncSnapshot) {
+        if (asyncSnapshot.hasData) {
+          print("future builder called ${asyncSnapshot.data.length}");
+          return Consumer<PdfFilesModel>(
+            builder: (context, pdffiles, child) {
+              debugPrint("${pdffiles.allPdfFiles.length}");
+              return _showFiles(asyncSnapshot);
+            },
+          );
+        } else if (asyncSnapshot.hasError) {
+          return Consumer<PdfFilesModel>(
+            builder: (context, pdffiles, child) {
+              return Container(
+                child: Center(
+                  child: Text('${asyncSnapshot.error}'),
+                ),
+              );
+            },
+          );
+        } else {
+          return Consumer<PdfFilesModel>(
+            builder: (context, pdffiles, child) {
+              return Container(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            },
+          );
+        }
+      },
     );
   }
 }

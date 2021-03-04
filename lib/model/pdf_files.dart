@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_file_manager/flutter_file_manager.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf_reader/service/shared_service.dart';
 
 PdfFiles pdfFilesFromJson(String str) => PdfFiles.fromJson(json.decode(str));
 
@@ -47,6 +48,28 @@ Future<List<PdfFiles>> getAllPdfFiles() async {
   var root = storageInfo[0].rootDir;
   var fm = FileManager(root: Directory(root)); //
   var files = await compute(getPdfFiles, fm);
+  var favourites = await SharedService().getAllFavourites();
+  debugPrint("compute favs $favourites");
+  if (favourites != null)
+    files = files.map((file) {
+      file.isFavourite = favourites.contains(file.file.path);
+      return file;
+    }).toList();
+  return files;
+}
+
+Future<List<PdfFiles>> getFavouritePdfFiles() async {
+  List<StorageInfo> storageInfo = await PathProviderEx.getStorageInfo();
+  var root = storageInfo[0].rootDir;
+  var fm = FileManager(root: Directory(root)); //
+  var files = await compute(getPdfFiles, fm);
+  var favourites = await SharedService().getAllFavourites();
+  debugPrint("compute favs getFavouritePdfFiles $favourites");
+  if (favourites != null)
+    files = files.where((file) {
+      file.isFavourite = favourites.contains(file.file.path);
+      return file.isFavourite;
+    }).toList();
   return files;
 }
 

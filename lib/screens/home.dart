@@ -1,4 +1,6 @@
+// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:pdf_reader/model/app_options.dart';
 import 'package:pdf_reader/model/pdf_files_model.dart';
 import 'package:pdf_reader/model/sort_by.dart';
 import 'package:pdf_reader/screens/favourite_screen.dart';
@@ -36,9 +38,9 @@ class _HomeState extends State<Home> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () => showSearch(
-                context: context,
-                delegate:
-                    SearchFilesScreen(filesList: fileProvider.allPdfFiles)),
+              context: context,
+              delegate: SearchFilesScreen(filesList: fileProvider.allPdfFiles),
+            ),
           ),
           PopupMenuButton(
             onSelected: (SortBy value) => sortFiles(value),
@@ -59,83 +61,116 @@ class _HomeState extends State<Home> {
             ],
           ),
           PopupMenuButton(
+            onSelected: (AppOptions option) async {
+              if (option == AppOptions.BrowseMoreFIles) {
+                // FilePickerResult result = await FilePicker.platform.pickFiles(
+                //   type: FileType.custom,
+                //   allowedExtensions: ['pdf'],
+                // );
+              }
+            },
             itemBuilder: (context) => [
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(
+                      Icons.folder_open_outlined,
+                      color: Colors.black,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
                     Text('Browse more files'),
                   ],
                 ),
+                value: AppOptions.BrowseMoreFIles,
               ),
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(Icons.access_alarms_rounded, color: Colors.amber),
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Browse more files'),
+                    Text('Remove Ads'),
                   ],
                 ),
+                value: AppOptions.RemoveAds,
               ),
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(
+                      Icons.star,
+                      color: Colors.yellow,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Browse more files'),
+                    Text('Rate us'),
                   ],
                 ),
+                value: AppOptions.RateUs,
               ),
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(
+                      Icons.feedback,
+                      color: Colors.black,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Browse more files'),
+                    Text('Send feedback'),
                   ],
                 ),
+                value: AppOptions.SendFeedback,
               ),
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(
+                      Icons.share,
+                      color: Colors.black,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Browse more files'),
+                    Text('Share this app'),
                   ],
                 ),
+                value: AppOptions.ShareThisApp,
               ),
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(
+                      Icons.sanitizer_outlined,
+                      color: Colors.red,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Browse more files'),
+                    Text('Privacy policy'),
                   ],
                 ),
+                value: AppOptions.PrivacyPolicy,
               ),
               PopupMenuItem(
                 child: Row(
                   children: [
-                    Icon(Icons.folder_open_outlined),
+                    Icon(
+                      Icons.indeterminate_check_box,
+                      color: Colors.blue,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
-                    Text('Browse more files'),
+                    Text('Change language'),
                   ],
                 ),
+                value: AppOptions.ChangeLanguage,
               ),
             ],
           ),
@@ -154,7 +189,7 @@ class _HomeState extends State<Home> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
+            icon: Icon(Icons.star),
             label: 'Favourite',
           ),
         ],

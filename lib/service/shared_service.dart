@@ -2,10 +2,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedService {
   static String favouriteKey = 'favourite';
+
   static getInstance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var favourite = prefs.getStringList(favouriteKey);
-    print('Favourites : $favourite');
+    print('Favourites : ${favourite}');
     return prefs;
   }
 
@@ -24,5 +25,11 @@ class SharedService {
     }
     favourites.remove(fileName);
     pref.setStringList(favouriteKey, favourites);
+  }
+
+  Future<List<String>> getAllFavourites() async {
+    SharedPreferences pref = await SharedService.getInstance();
+    var favourites = pref.getStringList(favouriteKey);
+    return favourites;
   }
 }

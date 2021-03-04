@@ -46,7 +46,9 @@ class _RenameDialogState extends State<RenameDialog> {
         ),
         FlatButton(
           child: Text('cancel'),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context, null);
+          },
         ),
       ],
     );

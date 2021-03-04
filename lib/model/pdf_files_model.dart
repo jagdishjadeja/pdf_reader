@@ -6,6 +6,7 @@ import 'package:pdf_reader/model/sort_order.dart';
 
 class PdfFilesModel extends ChangeNotifier {
   var _pdfFiles = List<PdfFiles>();
+  var _favPdfFiles = List<PdfFiles>();
   var _tempBool = false;
 
   Future<List<PdfFiles>> _futureFiles;
@@ -14,6 +15,16 @@ class PdfFilesModel extends ChangeNotifier {
   SortOrder sortOrder = SortOrder.NONE;
 
   initData() {}
+
+  void updateArray(int index, bool isFavourite) {
+    _pdfFiles[index].isFavourite = isFavourite;
+    notifyListeners();
+  }
+
+  void deleteFile(index) {
+    _pdfFiles.removeAt(index);
+    notifyListeners();
+  }
 
   List<PdfFiles> getPdfFiles() {
     return _pdfFiles;
@@ -35,16 +46,19 @@ class PdfFilesModel extends ChangeNotifier {
   void toggleBool() {
     _tempBool = !_tempBool;
     _futureFiles = getFiles();
-
     notifyListeners();
   }
 
   Future<List<PdfFiles>> getPdfFilesProvider() async {
-    // PdfFiles.
     var tempFiles = await getAllPdfFiles();
     _pdfFiles = tempFiles;
-
     return _pdfFiles;
+  }
+
+  Future<List<PdfFiles>> getFavoruiteFiles() async {
+    var tempFiles = await getFavouritePdfFiles();
+    _favPdfFiles = tempFiles;
+    return _favPdfFiles;
   }
 
   void sortFiles(SortBy sortBy) {
@@ -54,9 +68,14 @@ class PdfFilesModel extends ChangeNotifier {
       _pdfFiles.sort((a, b) => compareAsciiUpperCase(a.size, b.size));
     } else if (sortBy == SortBy.Date) {
       _pdfFiles.sort(
-          (a, b) => compareAsciiUpperCase(a.lastModified, b.lastModified));
+        (a, b) => compareAsciiUpperCase(a.lastModified, b.lastModified),
+      );
     }
-    debugPrint('Sorted By $sortBy');
     notifyListeners();
+    debugPrint('Sorted By $sortBy');
   }
+
+  void renameFile(index, file) {}
+
+  void toggleFavourite(index) {}
 }

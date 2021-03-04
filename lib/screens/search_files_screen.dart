@@ -1,3 +1,4 @@
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf_reader/model/pdf_files.dart';
 
@@ -14,6 +15,20 @@ class SearchFilesScreen extends SearchDelegate {
         itemCount: result.length,
         itemBuilder: (context, index) {
           return ListTile(
+            onTap: () async {
+              PDFDocument doc = await PDFDocument.fromFile(result[index].file);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return PDFViewer(
+                      document: doc,
+                      zoomSteps: 1,
+                    );
+                  },
+                ),
+              );
+            },
             leading: Text(result[index].name),
           );
         },
@@ -22,10 +37,10 @@ class SearchFilesScreen extends SearchDelegate {
       return Center(
         child: Text('File not found'),
       );
-}
+    }
   }
 
-  Widget _suggestion() {}
+  // Widget _suggestion() {}
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -66,16 +81,12 @@ class SearchFilesScreen extends SearchDelegate {
         ],
       );
     }
-    print(query);
 
     return _buildResult(query);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO: implement buildSuggestions
-    print(query);
-
     return _buildResult(query);
   }
 }
