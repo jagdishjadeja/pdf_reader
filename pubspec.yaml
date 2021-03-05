@@ -30,7 +30,7 @@ dependencies:
   path: ^1.6.4
   path_provider_ex: ^1.0.1
   flutter_file_manager: ^0.2.0
-  flutter_full_pdf_viewer: ^1.0.6
+  # flutter_full_pdf_viewer: ^1.0.6
   permission_handler: ^5.1.0+2
   shared_preferences: ^0.5.12+4
   flutter_isolate: ^1.0.0+15
@@ -41,7 +41,13 @@ dependencies:
   # flutter_plugin_pdf_viewer: ^1.2.2
   advance_pdf_viewer: ^1.2.2
   flutter_share: ^1.0.5
-  # file_picker: ^2.1.6
+  # file_picker:
+  # file_picker: ^2.1.7
+  # share: ^2.0.0
+  # file_picker:
+
+module:
+  androidX: true
 
 dev_dependencies:
   flutter_test:

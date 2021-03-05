@@ -1,4 +1,3 @@
-// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf_reader/model/app_options.dart';
 import 'package:pdf_reader/model/pdf_files_model.dart';
@@ -7,6 +6,7 @@ import 'package:pdf_reader/screens/favourite_screen.dart';
 import 'package:pdf_reader/screens/home_screen.dart';
 import 'package:pdf_reader/screens/search_files_screen.dart';
 import 'package:provider/provider.dart';
+// import 'package:file_picker/file_picker.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -63,10 +63,18 @@ class _HomeState extends State<Home> {
           PopupMenuButton(
             onSelected: (AppOptions option) async {
               if (option == AppOptions.BrowseMoreFIles) {
-                // FilePickerResult result = await FilePicker.platform.pickFiles(
+                // FilePickerResult result = await FilePicker..pickFiles(
                 //   type: FileType.custom,
                 //   allowedExtensions: ['pdf'],
                 // );
+                // FilePicker.
+                // FilePickerResult result = await FilePicker.platform.pickFiles();
+
+                // if (result != null) {
+                //   File file = File(result.files.single.path);
+                // } else {
+                //   // User canceled the picker
+                // }
               }
             },
             itemBuilder: (context) => [

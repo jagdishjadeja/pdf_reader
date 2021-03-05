@@ -3,6 +3,7 @@ import 'package:pdf_reader/model/pdf_files.dart';
 import "package:collection/collection.dart";
 import 'package:pdf_reader/model/sort_by.dart';
 import 'package:pdf_reader/model/sort_order.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PdfFilesModel extends ChangeNotifier {
   var _pdfFiles = List<PdfFiles>();
@@ -50,8 +51,11 @@ class PdfFilesModel extends ChangeNotifier {
   }
 
   Future<List<PdfFiles>> getPdfFilesProvider() async {
-    var tempFiles = await getAllPdfFiles();
-    _pdfFiles = tempFiles;
+    var permission = await Permission.storage.request().isGranted;
+    if (permission) {
+      var tempFiles = await getAllPdfFiles();
+      _pdfFiles = tempFiles;
+    }
     return _pdfFiles;
   }
 
@@ -78,4 +82,6 @@ class PdfFilesModel extends ChangeNotifier {
   void renameFile(index, file) {}
 
   void toggleFavourite(index) {}
+
+  void share() {}
 }

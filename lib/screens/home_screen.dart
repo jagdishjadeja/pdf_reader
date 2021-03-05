@@ -42,11 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
     FileOperations operation,
     PdfFiles file,
   ) async {
-    var pdfProvider = Provider.of<PdfFilesModel>(context, listen: true);
+    // var pdfProvider = Provider.of<PdfFilesModel>(context, listen: true);
 
     if (operation == FileOperations.Favourite) {
       // Custom Toast Position
-
       if (file.isFavourite) {
         await SharedService.removeFromFavourite(file.file.path);
         showToast('Removed From Favourite');
@@ -62,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
         text: 'Example share text',
         filePath: file.file.path,
       );
-
       return file;
     } else if (operation == FileOperations.Rename) {
       var newFileName = await showDialog<String>(
@@ -112,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTrailing(PdfFiles file, int index) {
-    var pdfProvider = Provider.of<PdfFilesModel>(context, listen: true);
+    var pdfProvider = Provider.of<PdfFilesModel>(context, listen: false);
 
     return PopupMenuButton(
       onSelected: (FileOperations operation) async {

@@ -5,6 +5,7 @@ import 'package:flutter_file_manager/flutter_file_manager.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf_reader/service/shared_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 PdfFiles pdfFilesFromJson(String str) => PdfFiles.fromJson(json.decode(str));
 
@@ -40,7 +41,8 @@ Future<List<PdfFiles>> getFiles() async {
   List<StorageInfo> storageInfo = await PathProviderEx.getStorageInfo();
   var root = storageInfo[0].rootDir;
   var fm = FileManager(root: Directory(root)); //
-  return compute(getPdfFiles, fm);
+  var permission = await Permission.storage.request().isGranted;
+  if (permission) return compute(getPdfFiles, fm);
 }
 
 Future<List<PdfFiles>> getAllPdfFiles() async {
@@ -59,17 +61,20 @@ Future<List<PdfFiles>> getAllPdfFiles() async {
 }
 
 Future<List<PdfFiles>> getFavouritePdfFiles() async {
+  var favourites = await SharedService().getAllFavourites();
+  if (favourites == null) return [];
+
   List<StorageInfo> storageInfo = await PathProviderEx.getStorageInfo();
   var root = storageInfo[0].rootDir;
-  var fm = FileManager(root: Directory(root)); //
+  var fm = FileManager(root: Directory(root));
   var files = await compute(getPdfFiles, fm);
-  var favourites = await SharedService().getAllFavourites();
   debugPrint("compute favs getFavouritePdfFiles $favourites");
-  if (favourites != null)
-    files = files.where((file) {
-      file.isFavourite = favourites.contains(file.file.path);
-      return file.isFavourite;
-    }).toList();
+
+  files = files.where((file) {
+    file.isFavourite = favourites.contains(file.file.path);
+    return file.isFavourite;
+  }).toList();
+
   return files;
 }
 

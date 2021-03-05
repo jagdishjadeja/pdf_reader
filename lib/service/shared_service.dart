@@ -6,13 +6,16 @@ class SharedService {
   static getInstance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var favourite = prefs.getStringList(favouriteKey);
-    print('Favourites : ${favourite}');
+    print('Favourites : $favourite');
     return prefs;
   }
 
   static addToFavourite(String fileName) async {
     SharedPreferences pref = await SharedService.getInstance();
     var favourites = pref.getStringList(favouriteKey);
+    if (favourites == null) {
+      favourites = [];
+    }
     favourites.add(fileName);
     pref.setStringList(favouriteKey, favourites);
   }

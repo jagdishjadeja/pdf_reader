@@ -13,7 +13,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => PdfFilesModel(),
+          create: (context) {
+            return PdfFilesModel();
+          },
         ),
       ],
       child: MaterialApp(
