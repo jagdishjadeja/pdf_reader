@@ -42,7 +42,7 @@ Future<List<PdfFiles>> getFiles() async {
   var root = storageInfo[0].rootDir;
   var fm = FileManager(root: Directory(root)); //
   var permission = await Permission.storage.request().isGranted;
-  if (permission) return compute(getPdfFiles, fm);
+  return permission ? compute(getPdfFiles, fm) : [];
 }
 
 Future<List<PdfFiles>> getAllPdfFiles() async {
@@ -63,18 +63,15 @@ Future<List<PdfFiles>> getAllPdfFiles() async {
 Future<List<PdfFiles>> getFavouritePdfFiles() async {
   var favourites = await SharedService().getAllFavourites();
   if (favourites == null) return [];
-
   List<StorageInfo> storageInfo = await PathProviderEx.getStorageInfo();
   var root = storageInfo[0].rootDir;
   var fm = FileManager(root: Directory(root));
   var files = await compute(getPdfFiles, fm);
   debugPrint("compute favs getFavouritePdfFiles $favourites");
-
   files = files.where((file) {
     file.isFavourite = favourites.contains(file.file.path);
     return file.isFavourite;
   }).toList();
-
   return files;
 }
 

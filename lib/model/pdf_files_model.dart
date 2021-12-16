@@ -6,8 +6,8 @@ import 'package:pdf_reader/model/sort_order.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PdfFilesModel extends ChangeNotifier {
-  var _pdfFiles = List<PdfFiles>();
-  var _favPdfFiles = List<PdfFiles>();
+  var _pdfFiles = <PdfFiles>[];
+  var _favPdfFiles = <PdfFiles>[];
   var _tempBool = false;
 
   Future<List<PdfFiles>> _futureFiles;

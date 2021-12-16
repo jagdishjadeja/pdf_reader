@@ -38,13 +38,13 @@ class _RenameDialogState extends State<RenameDialog> {
         ),
       ),
       actions: [
-        FlatButton(
+        TextButton(
           child: Text('save'),
           onPressed: () {
             Navigator.pop(context, fileFormField.text);
           },
         ),
-        FlatButton(
+        TextButton(
           child: Text('cancel'),
           onPressed: () {
             Navigator.pop(context, null);

@@ -9,7 +9,6 @@ class SearchFilesScreen extends SearchDelegate {
 
   Widget _buildResult(String query) {
     var result = filesList.where((x) => x.name.contains(query)).toList();
-
     if (result.length > 0) {
       return ListView.builder(
         itemCount: result.length,
@@ -44,7 +43,6 @@ class SearchFilesScreen extends SearchDelegate {
 
   @override
   List<Widget> buildActions(BuildContext context) {
-    // TODO: implement buildActions
     return [
       IconButton(
         icon: Icon(Icons.clear),
@@ -57,7 +55,6 @@ class SearchFilesScreen extends SearchDelegate {
 
   @override
   Widget buildLeading(BuildContext context) {
-    // TODO: implement buildLeading
     return IconButton(
       icon: Icon(Icons.arrow_back),
       onPressed: () {
@@ -68,7 +65,6 @@ class SearchFilesScreen extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    // TODO: implement buildResults
     if (query.length < 3) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +77,6 @@ class SearchFilesScreen extends SearchDelegate {
         ],
       );
     }
-
     return _buildResult(query);
   }
 
